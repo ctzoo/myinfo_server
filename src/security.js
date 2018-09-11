@@ -20,9 +20,9 @@ function sortJSON(json) {
   var keys = Object.keys(json);
   keys.sort();
 
-  for (key in keys) {
-    newJSON[keys[key]] = json[keys[key]];
-  }
+  keys.forEach(key => {
+    newJSON[key] = json[key];
+  })
 
   return newJSON;
 };
@@ -100,7 +100,7 @@ function generateSHA256withRSAHeader(url, params, method, strContentType, appId,
  * @param passphrase API Secret or certificate passphrase
  * @returns {string}
  */
-security.generateAuthorizationHeader = function(url, params, method, strContentType, authType, appId, keyCertContent, passphrase, realm) {
+security.generateAuthorizationHeader = function (url, params, method, strContentType, authType, appId, keyCertContent, passphrase, realm) {
 
   if (authType == "L2") {
     return generateSHA256withRSAHeader(url, params, method, strContentType, appId, keyCertContent, passphrase, realm);
@@ -120,10 +120,9 @@ security.verifyJWS = function verifyJWS(jws, publicCert) {
       ignoreNotBefore: true
     });
     return decoded;
-  }
-  catch(error) {
+  } catch (error) {
     console.error("Error with verifying and decoding JWE: %s".red, error);
-    throw("Error with verifying and decoding JWS");
+    throw ("Error with verifying and decoding JWS");
   }
 }
 
@@ -133,37 +132,37 @@ security.decryptJWE = function decryptJWE(header, encryptedKey, iv, cipherText, 
   // console.log(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + tag);
   return new Promise((resolve, reject) => {
 
-    var keystore = jose.JWK.createKeyStore();
+      var keystore = jose.JWK.createKeyStore();
 
-    // console.log((new Buffer(header,'base64')).toString('ascii'));
+      // console.log((new Buffer(header,'base64')).toString('ascii'));
 
-    var data = {
-      "type": "compact",
-      "ciphertext": cipherText,
-      "protected": header,
-      "encrypted_key": encryptedKey,
-      "tag": tag,
-      "iv": iv,
-      "header": JSON.parse(jose.util.base64url.decode(header).toString())
-    };
-    keystore.add(fs.readFileSync(privateKey, 'utf8'), "pem")
-      .then(function(jweKey) {
-        // {result} is a jose.JWK.KeyauthType
-        jose.JWE.createDecrypt(jweKey)
-          .decrypt(data)
-          .then(function(result) {
-            resolve(JSON.parse(result.payload.toString()));
-          })
-          .catch(function(error) {
-            reject(error);
-          });
-      });
+      var data = {
+        "type": "compact",
+        "ciphertext": cipherText,
+        "protected": header,
+        "encrypted_key": encryptedKey,
+        "tag": tag,
+        "iv": iv,
+        "header": JSON.parse(jose.util.base64url.decode(header).toString())
+      };
+      keystore.add(fs.readFileSync(privateKey, 'utf8'), "pem")
+        .then(function (jweKey) {
+          // {result} is a jose.JWK.KeyauthType
+          jose.JWE.createDecrypt(jweKey)
+            .decrypt(data)
+            .then(function (result) {
+              resolve(JSON.parse(result.payload.toString()));
+            })
+            .catch(function (error) {
+              reject(error);
+            });
+        });
 
-  })
-  .catch (error => {
-    // console.error("Error with decrypting JWE: %s", error);
-    throw "Error with decrypting JWE";
-  })
+    })
+    .catch(error => {
+      // console.error("Error with decrypting JWE: %s", error);
+      throw "Error with decrypting JWE";
+    })
 }
 
 module.exports = security;
