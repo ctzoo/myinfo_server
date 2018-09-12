@@ -1,0 +1,24 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:3.4
+    restart: always
+    volumes:
+      - mongodata:/data/db
+      - mongoconfig:/data/configdb
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "27017:27017"
+
+  express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8082:8081"
+    links:
+      - mongo
+
+volumes:
+  mongodata:
+  mongoconfig:
