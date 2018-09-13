@@ -27,5 +27,9 @@
     "tokenSecret": "tokenSecret",
     "stateSecret": "stateSecret",
     "expire": 300
+  },
+  "mongo": {
+    "url": "mongodb://localhost:27017",
+    "db": "myinfo"
   }
 }

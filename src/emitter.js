@@ -2,15 +2,15 @@ const events = require('events')
 const emitter = new events.EventEmitter()
 const logger = require('./logger')
 
+const mongoConfig = require('config').get('mongo');
 const MongoClient = require('mongodb').MongoClient
-const url = 'mongodb://localhost:27017'
 
 emitter.on('person', async data => {
     try {
-        const client = await MongoClient.connect(url, {
+        const client = await MongoClient.connect(mongoConfig.url, {
             useNewUrlParser: true
         })
-        const col = client.db('myinfo').collection('person')
+        const col = client.db(mongoConfig.db).collection('person')
         await col.insertOne(data)
         client.close()
     } catch (e) {
