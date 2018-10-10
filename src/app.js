@@ -24,9 +24,9 @@ app.oauth = oauthServer({
     accessTokenLifetime: oauthConfig.expire,
 });
 
-app.all('/oauth/token', app.oauth.grant());
+app.all('/myinfostg/oauth/token', app.oauth.grant());
 
-app.get('/', app.oauth.authorise(), (req, res) => {
+app.get('/myinfostg', app.oauth.authorise(), (req, res) => {
     // 回调增加state
     const user = req.user;
     const state = jwt.sign({
@@ -41,7 +41,7 @@ app.get('/', app.oauth.authorise(), (req, res) => {
     res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, attributes));
 });
 
-app.get('/callback', (req, res) => {
+app.get('/myinfostg/callback', (req, res) => {
     const data = req.query;
     const state = jwt.verify(data.state, oauthConfig.stateSecret);
     const users = getClients().filter(item => item.clientId === state.clientId);
