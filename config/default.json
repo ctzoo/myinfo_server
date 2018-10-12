@@ -1,28 +1,4 @@
 {
-  "L0": {
-    "privateKey": "./ssl/stg-myinfo-2018.pem",
-    "publicKey": "./ssl/stg-auth-signing-public.pem",
-    "clientId": "STG2-MYINFO-SELF-TEST",
-    "clientSecret": "44d953c796cccebcec9bdc826852857ab412fbe2",
-    "redirectUrl": "http://localhost:3001/callback",
-    "realmUrl": "http://localhost:3001",
-    "authLevel": "L0",
-    "authApiUrl": "https://myinfosgstg.api.gov.sg/dev/v1/authorise",
-    "tokenApiUrl": "https://myinfosgstg.api.gov.sg/dev/v1/token",
-    "personApiUrl": "https://myinfosgstg.api.gov.sg/dev/v1/person"
-  },
-  "L2": {
-    "privateKey": "./ssl/stg-myinfo-2018.pem",
-    "publicKey": "./ssl/stg-auth-signing-public.pem",
-    "clientId": "STG2-MYINFO-SELF-TEST",
-    "clientSecret": "44d953c796cccebcec9bdc826852857ab412fbe2",
-    "redirectUrl": "http://localhost:3001/callback",
-    "realmUrl": "http://localhost:3001",
-    "authLevel": "L2",
-    "authApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/authorise",
-    "tokenApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/token",
-    "personApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/person"
-  },
   "oauth": {
     "tokenSecret": "tokenSecret",
     "stateSecret": "stateSecret",
