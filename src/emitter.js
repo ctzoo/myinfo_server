@@ -22,6 +22,10 @@ emitter.on('person', data => {
     logger.info(JSON.stringify(data));
 })
 
+emitter.on('info', data => {
+    logger.info(data);
+})
+
 emitter.on('warn', data => {
     logger.warn(JSON.stringify(data));
 })

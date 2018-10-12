@@ -31,6 +31,7 @@
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-latest": "^6.24.1",
+    "https-proxy-agent": "^2.2.1",
     "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.10.0",
     "webpack-node-externals": "^1.6.0"

@@ -5,28 +5,30 @@ const jwt = require('jsonwebtoken');
 const myInfoApi = require('./api');
 const getClients = require('./data').getClients;
 const getTemplate = require('./data').getTemplate;
+const contentPath = require('config').get('content');
 const oauthConfig = require('config').get('oauth');
 const emitter = require('./emitter')
 
 const app = express();
+const router = express();
 
-app.use(
+router.use(
     bodyParser.urlencoded({
         extended: true,
     })
 );
 
-app.use(bodyParser.json());
+router.use(bodyParser.json());
 
-app.oauth = oauthServer({
+router.oauth = oauthServer({
     model: require('./model'),
     grants: ['client_credentials'],
     accessTokenLifetime: oauthConfig.expire,
 });
 
-app.all('/myinfostg/oauth/token', app.oauth.grant());
+router.all('/oauth/token', router.oauth.grant());
 
-app.get('/myinfostg', app.oauth.authorise(), (req, res) => {
+router.get('/', router.oauth.authorise(), (req, res) => {
     // 回调增加state
     const user = req.user;
     const state = jwt.sign({
@@ -41,7 +43,7 @@ app.get('/myinfostg', app.oauth.authorise(), (req, res) => {
     res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, attributes));
 });
 
-app.get('/myinfostg/callback', (req, res) => {
+router.get('/callback', (req, res) => {
     const data = req.query;
     const state = jwt.verify(data.state, oauthConfig.stateSecret);
     const users = getClients().filter(item => item.clientId === state.clientId);
@@ -54,9 +56,13 @@ app.get('/myinfostg/callback', (req, res) => {
         });
     } else {
         const user = users[0];
+        emitter.emit('info', `Start get Token  >>>${data.code}`)
         myInfoApi
             .getTokenApi(data.code)
-            .then(token => myInfoApi.getPersonApi(token.access_token, attributes))
+            .then(token => {
+                emitter.emit('info', `Start get Person  >>>${token.access_token}`)
+                return myInfoApi.getPersonApi(token.access_token, attributes)
+            })
             .then(data => {
                 // Myinfo平台接口记录来源系统、使用目的、客户NRIC/FIN, 提取数据的栏位名、提取时间
                 emitter.emit('person', {
@@ -70,13 +76,22 @@ app.get('/myinfostg/callback', (req, res) => {
                 );
             })
             .catch(e => {
-                res.redirect(
-                    `${user.redirectUrl}?state=${state.state}&data=${jwt.sign (e, user.clientSecret)}`
-                );
+                if (e.status) {
+                    res.redirect(
+                        `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: e.status, msg: e.msg}, user.clientSecret)}`
+                    );
+                } else {
+                    emitter.emit('error', `Response Error >>>${e.message}`)
+                    res.redirect(
+                        `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: "ERROR", msg: "Network error"}, user.clientSecret)}`
+                    );
+                }
             });
     }
 });
 
-app.use(app.oauth.errorHandler());
+router.use(router.oauth.errorHandler());
+
+app.use(`/${contentPath}`, router);
 
 app.listen(3001);
