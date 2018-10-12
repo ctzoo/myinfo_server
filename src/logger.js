@@ -1,4 +1,6 @@
 const log4js = require('log4js')
+const logLevel = require('config').get('logLevel');
+
 log4js.configure({
     disableClustering: true,
     appenders: {
@@ -10,7 +12,7 @@ log4js.configure({
     categories: {
         default: {
             appenders: ['out'],
-            level: 'info'
+            level: logLevel
         }
     }
 })
