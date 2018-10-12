@@ -3,28 +3,27 @@ const querystring = require('querystring');
 const fetch = require('node-fetch');
 const HttpsProxyAgent = require('https-proxy-agent');
 const URLSearchParams = require('url-search-params');
-const myInfoConfig = require('config').get('L2');
 const proxyPath = require('config').get('proxy');
 const securityHelper = require('./security');
 const emitter = require('./emitter');
 
-function getAuthoriseUrl(state, purpose, attributes) {
+function getAuthoriseUrl(state, purpose, template) {
     return (
-        myInfoConfig.authApiUrl +
+        template.authApiUrl +
         '?client_id=' +
-        myInfoConfig.clientId +
+        template.clientId +
         '&attributes=' +
-        attributes +
+        template.attributes +
         '&purpose=' +
         purpose +
         '&state=' +
         state +
         '&redirect_uri=' +
-        myInfoConfig.redirectUrl
+        template.redirectUrl
     );
 }
 
-async function getTokenApi(code) {
+async function getTokenApi(code, template) {
     const cacheCtl = 'no-cache';
     const contentType = 'application/x-www-form-urlencoded';
     const method = 'POST';
@@ -37,11 +36,11 @@ async function getTokenApi(code) {
         '&code=' +
         code +
         '&redirect_uri=' +
-        myInfoConfig.redirectUrl +
+        template.redirectUrl +
         '&client_id=' +
-        myInfoConfig.clientId +
+        template.clientId +
         '&client_secret=' +
-        myInfoConfig.clientSecret;
+        template.clientSecret;
     const params = querystring.parse(strParams);
 
     // assemble headers for Token API
@@ -52,15 +51,15 @@ async function getTokenApi(code) {
     // Sign request and add Authorization Headers
     // t3step2a PASTE CODE BELOW
     const authHeaders = securityHelper.generateAuthorizationHeader(
-        myInfoConfig.tokenApiUrl,
+        template.tokenApiUrl,
         params,
         method,
         contentType,
-        myInfoConfig.authLevel,
-        myInfoConfig.clientId,
-        myInfoConfig.privateKey,
-        myInfoConfig.clientSecret,
-        myInfoConfig.realmUrl
+        template.authLevel,
+        template.clientId,
+        template.privateKey,
+        template.clientSecret,
+        template.realmUrl
     );
 
     if (!_.isEmpty(authHeaders)) {
@@ -78,9 +77,9 @@ async function getTokenApi(code) {
     const formParams = new URLSearchParams();
     formParams.append('grant_type', 'authorization_code');
     formParams.append('code', code);
-    formParams.append('redirect_uri', myInfoConfig.redirectUrl);
-    formParams.append('client_id', myInfoConfig.clientId);
-    formParams.append('client_secret', myInfoConfig.clientSecret);
+    formParams.append('redirect_uri', template.redirectUrl);
+    formParams.append('client_id', template.clientId);
+    formParams.append('client_secret', template.clientSecret);
 
     emitter.emit('info', `Sending Token Request >>>${code}`);
     const options = {
@@ -91,7 +90,7 @@ async function getTokenApi(code) {
     if (proxyPath !== "") {
         options.agent = new HttpsProxyAgent(proxyPath)
     }
-    return fetch(myInfoConfig.tokenApiUrl, options)
+    return fetch(template.tokenApiUrl, options)
         .then(res => {
             if (res.status === 200) {
                 return res.json();
@@ -116,10 +115,10 @@ async function getTokenApi(code) {
         });
 }
 
-async function getPersonApi(accessToken, attributes) {
+async function getPersonApi(accessToken, template) {
     const decoded = securityHelper.verifyJWS(
         accessToken,
-        myInfoConfig.publicKey
+        template.publicKey
     );
     if (decoded == undefined || decoded == null) {
         emitter.emit('warn', 'Invalid token, Not find Access Token');
@@ -141,13 +140,13 @@ async function getPersonApi(accessToken, attributes) {
             msg: 'UINFIN NOT FOUND',
         });
     }
-    const url = myInfoConfig.personApiUrl + '/' + uinfin + '/';
+    const url = template.personApiUrl + '/' + uinfin + '/';
     const cacheCtl = 'no-cache';
     const method = 'GET';
     // assemble params for Person API
     // t2step6 PASTE CODE BELOW
     const strParams =
-        'client_id=' + myInfoConfig.clientId + '&attributes=' + attributes;
+        'client_id=' + template.clientId + '&attributes=' + template.attributes;
     const params = querystring.parse(strParams);
 
     // assemble headers for Person API
@@ -161,11 +160,11 @@ async function getPersonApi(accessToken, attributes) {
         params,
         method,
         '', // no content type needed for GET
-        myInfoConfig.authLevel,
-        myInfoConfig.clientId,
-        myInfoConfig.privateKey,
-        myInfoConfig.clientSecret,
-        myInfoConfig.realmUrl
+        template.authLevel,
+        template.clientId,
+        template.privateKey,
+        template.clientSecret,
+        template.realmUrl
     );
     // t3step2b END PASTE CODE
     if (!_.isEmpty(authHeaders)) {
@@ -200,7 +199,7 @@ async function getPersonApi(accessToken, attributes) {
                     msg: 'PERSON DATA NOT FOUND',
                 });
             } else {
-                if (myInfoConfig.authLevel === 'L0') {
+                if (template.authLevel === 'L0') {
                     personData = JSON.parse(personData);
                     personData.uinfin = uinfin; // add the uinfin into the data to display on screen
 
@@ -209,7 +208,7 @@ async function getPersonApi(accessToken, attributes) {
                     // successful. return data back to frontend
                     emitter.emit('info', `Response from Person  >>>${personData}`);
                     return personData;
-                } else if (myInfoConfig.authLevel === 'L2') {
+                } else if (template.authLevel === 'L2') {
                     // console.log("Response from Person API:");
                     // console.log(personData);
                     //t3step3 PASTE CODE BELOW
@@ -224,7 +223,7 @@ async function getPersonApi(accessToken, attributes) {
                             jweParts[2],
                             jweParts[3],
                             jweParts[4],
-                            myInfoConfig.privateKey
+                            template.privateKey
                         )
                         .then(personData => {
                             if (personData === undefined || personData == null) {

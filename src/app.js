@@ -38,16 +38,16 @@ router.get('/', router.oauth.authorise(), (req, res) => {
         },
         oauthConfig.stateSecret
     );
-    const attributes = getTemplate()[req.query.templateId];
+    const template = getTemplate()[req.query.templateId];
     emitter.emit('token', req.query.state)
-    res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, attributes));
+    res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, template));
 });
 
-router.get('/callback', (req, res) => {
+router.get('/callback*', (req, res) => {
     const data = req.query;
     const state = jwt.verify(data.state, oauthConfig.stateSecret);
     const users = getClients().filter(item => item.clientId === state.clientId);
-    const attributes = getTemplate()[state.templateId];
+    const template = getTemplate()[state.templateId];
     if (!users.length) {
         emitter.emit('warn', `Not find client[${state.clientId}]`);
         res.send({
@@ -58,10 +58,10 @@ router.get('/callback', (req, res) => {
         const user = users[0];
         emitter.emit('info', `Start get Token  >>>${data.code}`)
         myInfoApi
-            .getTokenApi(data.code)
+            .getTokenApi(data.code, template)
             .then(token => {
                 emitter.emit('info', `Start get Person  >>>${token.access_token}`)
-                return myInfoApi.getPersonApi(token.access_token, attributes)
+                return myInfoApi.getPersonApi(token.access_token, template)
             })
             .then(data => {
                 // Myinfo平台接口记录来源系统、使用目的、客户NRIC/FIN, 提取数据的栏位名、提取时间
@@ -69,7 +69,7 @@ router.get('/callback', (req, res) => {
                     client: user.clientId,
                     purpose: user.purpose,
                     nric: data.msg.uinfin,
-                    attributes
+                    attributes: template.attributes
                 })
                 res.redirect(
                     `${user.redirectUrl}?state=${state.state}&data=${jwt.sign (data, user.clientSecret)}`
