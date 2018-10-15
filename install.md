@@ -19,7 +19,7 @@
   1. root登录  
   2. 上传 mongodb-linux-x86_64-4.0.2.tgz 到/usr/local  
   3. tar -xvf mongodb-linux-x86_64-4.0.2.tgz  
-  4. mv mongodb-linux-x86_64-4.0.2.tgz mongodb  
+  4. mv mongodb-linux-x86_64-4.0.2 mongodb  
   5. cd /usr/local/mongodb  
 
 ### 1.2.2. 添加环境变量 
