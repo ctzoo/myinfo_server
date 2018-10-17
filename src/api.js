@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const HttpsProxyAgent = require('https-proxy-agent');
 const URLSearchParams = require('url-search-params');
 const proxyPath = require('config').get('proxy');
+const timeout = require('config').get('timeout');
 const securityHelper = require('./security');
 const emitter = require('./emitter');
 
@@ -85,7 +86,8 @@ async function getTokenApi(code, template) {
     const options = {
         headers,
         method: 'POST',
-        body: formParams
+        body: formParams,
+        timeout: timeout * 1000,
     }
     if (proxyPath !== "") {
         options.agent = new HttpsProxyAgent(proxyPath)
@@ -185,6 +187,7 @@ async function getPersonApi(accessToken, template) {
     const options = {
         method: 'GET',
         headers,
+        timeout: timeout * 1000,
     }
     if (proxyPath !== "") {
         options.agent = new HttpsProxyAgent(proxyPath)

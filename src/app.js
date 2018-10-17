@@ -43,50 +43,76 @@ router.get('/', router.oauth.authorise(), (req, res) => {
     res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, template));
 });
 
-router.get('/callback*', (req, res) => {
+router.get('/callback', (req, res) => {
     const data = req.query;
-    const state = jwt.verify(data.state, oauthConfig.stateSecret);
-    const users = getClients().filter(item => item.clientId === state.clientId);
-    const template = getTemplate()[state.templateId];
-    if (!users.length) {
-        emitter.emit('warn', `Not find client[${state.clientId}]`);
+    try {
+        const state = jwt.verify(data.state, oauthConfig.stateSecret);
+        const users = getClients().filter(item => item.clientId === state.clientId);
+        const template = getTemplate()[state.templateId];
+        if (!users.length) {
+            emitter.emit('warn', `Not find client[${state.clientId}]`);
+            res.send({
+                status: 'ERROR',
+                msg: `NO CLIENT[${state.clientId}] INFORMATION`,
+            });
+        } else if (!template) {
+            const user = users[0];
+            const errMsg = {
+                status: 'ERROR',
+                msg: `NO TEMPLATE[${state.templateId}] INFORMATION`
+            }
+            res.redirect(
+                `${user.redirectUrl}?state=${state.state}&data=${jwt.sign(errMsg, user.clientSecret)}`
+            );
+        } else if (!data.code) {
+            const user = users[0];
+            const errMsg = {
+                status: 'ERROR',
+                msg: 'NO FOUND myinfo authorise code'
+            }
+            res.redirect(
+                `${user.redirectUrl}?state=${state.state}&data=${jwt.sign(errMsg, user.clientSecret)}`
+            );
+        } else {
+            const user = users[0];
+            emitter.emit('info', `Start get Token  >>>${data.code}`)
+            myInfoApi
+                .getTokenApi(data.code, template)
+                .then(token => {
+                    emitter.emit('info', `Start get Person  >>>${token.access_token}`)
+                    return myInfoApi.getPersonApi(token.access_token, template)
+                })
+                .then(data => {
+                    // Myinfo平台接口记录来源系统、使用目的、客户NRIC/FIN, 提取数据的栏位名、提取时间
+                    emitter.emit('person', {
+                        client: user.clientId,
+                        purpose: user.purpose,
+                        nric: data.msg.uinfin,
+                        attributes: template.attributes
+                    })
+                    res.redirect(
+                        `${user.redirectUrl}?state=${state.state}&data=${jwt.sign (data, user.clientSecret)}`
+                    );
+                })
+                .catch(e => {
+                    if (e.status) {
+                        res.redirect(
+                            `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: e.status, msg: e.msg}, user.clientSecret)}`
+                        );
+                    } else {
+                        emitter.emit('error', `Response Error >>>${e.message}`)
+                        res.redirect(
+                            `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: "ERROR", msg: "Network error"}, user.clientSecret)}`
+                        );
+                    }
+                });
+        }
+    } catch (error) {
+        emitter.emit('warn', `Request Query >>>${JSON.stringify (data)}, Error >>>${error.message}`);
         res.send({
             status: 'ERROR',
-            msg: 'NO CLIENT INFORMATION',
+            msg: 'Myinfo Authorization error'
         });
-    } else {
-        const user = users[0];
-        emitter.emit('info', `Start get Token  >>>${data.code}`)
-        myInfoApi
-            .getTokenApi(data.code, template)
-            .then(token => {
-                emitter.emit('info', `Start get Person  >>>${token.access_token}`)
-                return myInfoApi.getPersonApi(token.access_token, template)
-            })
-            .then(data => {
-                // Myinfo平台接口记录来源系统、使用目的、客户NRIC/FIN, 提取数据的栏位名、提取时间
-                emitter.emit('person', {
-                    client: user.clientId,
-                    purpose: user.purpose,
-                    nric: data.msg.uinfin,
-                    attributes: template.attributes
-                })
-                res.redirect(
-                    `${user.redirectUrl}?state=${state.state}&data=${jwt.sign (data, user.clientSecret)}`
-                );
-            })
-            .catch(e => {
-                if (e.status) {
-                    res.redirect(
-                        `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: e.status, msg: e.msg}, user.clientSecret)}`
-                    );
-                } else {
-                    emitter.emit('error', `Response Error >>>${e.message}`)
-                    res.redirect(
-                        `${user.redirectUrl}?state=${state.state}&data=${jwt.sign({status: "ERROR", msg: "Network error"}, user.clientSecret)}`
-                    );
-                }
-            });
     }
 });
 
