@@ -10,5 +10,6 @@
   },
   "logLevel": "info",
   "content": "",
-  "proxy": ""
+  "proxy": "",
+  "timeout": 30
 }

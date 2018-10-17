@@ -6,6 +6,10 @@ const moment = require('moment')
 const mongoConfig = require('config').get('mongo');
 const MongoClient = require('mongodb').MongoClient
 
+process.on('uncaughtException', function (err) {
+    logger.warn('uncaughtException', err);
+});
+
 emitter.on('person', async data => {
     try {
         const client = await MongoClient.connect(mongoConfig.url, {
