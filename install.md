@@ -5,15 +5,14 @@
   1. root登录  
   2. 上传node-v6.9.5-linux-x64.tar.xz到/opt目录  
   3. tar -xvf node-v6.9.5-linux-x64.tar.xz  
-  4. ln -s /opt/node-v6.9.5-linux-x64/bin/node /usr/local/bin/node  
-  5. ln -s /opt/node-v6.9.5-linux-x64/bin/npm /usr/local/bin/npm  
 ### 1.1.2. 编辑环境变量  
-  1. .vi /etc/profile  
+  1. vi /etc/profile  
   2. export NODE_HOME=/opt/node-v6.9.5-linux-x64/  
   3. export PATH=$PATH:$NODE_HOME/bin  
   4. export NODE_PATH=$NODE_HOME/lib/node_modules  
   5. 保存并退出编辑  
-  6. 验证安装结果：输入 node -v  （如正确安装会出现nodeJs版本号)
+  6. . /etc/profile
+  7. 验证安装结果：输入 node -v  （如正确安装会出现nodeJs版本号)
 ## 1.2. 安装mongodb
 ### 1.2.1. 拷贝mongodb
   1. root登录  
