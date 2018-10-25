@@ -1,16 +1,20 @@
 #!/bin/bash
-targetpath='/backup/mongobak'
+mongohost='rs2:27017'
+mongodb='myinfo'
+mongocol='person'
+
+targetpath="/mongobak/${mongodb}"
 # nowtime='20181012'
 nowtime=$(date +"%Y%m%d" -d "-1day")
 
 expdata()
 {
-  mongoexport -d myinfo -c person -q "{timeStamp: /^${nowtime}/}" -o ${targetpath}/${nowtime}.json
+  mongoexport -d ${mongodb} -c ${mongocol} -q "{timeStamp: /^${nowtime}/}" -o ${targetpath}/${mongocol}-${nowtime}.json
 }
 
 impdata()
 {
-  mongoimport -h rs2:27017 -d myinfo -c person --file ${targetpath}/${nowtime}.json --mode merge
+  mongoimport -h ${mongohost} -d ${mongodb} -c ${mongocol} --file ${targetpath}/${mongocol}-${nowtime}.json --mode merge
 }
 
 execute()

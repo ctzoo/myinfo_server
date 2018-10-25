@@ -6,7 +6,7 @@
   2. 上传node-v6.9.5-linux-x64.tar.xz到/opt目录  
   3. tar -xvf node-v6.9.5-linux-x64.tar.xz  
 ### 1.1.2. 编辑环境变量  
-  1. vi /etc/profile  
+  1. vi /etc/profile
   2. export NODE_HOME=/opt/node-v6.9.5-linux-x64/  
   3. export PATH=$PATH:$NODE_HOME/bin  
   4. export NODE_PATH=$NODE_HOME/lib/node_modules  

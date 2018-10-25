@@ -70,10 +70,7 @@ async function getTokenApi(code, template) {
 
     // console.log("Request Header for Token API:");
     // console.log(JSON.stringify(headers));
-    emitter.emit(
-        'info',
-        `Request Header for Token API: ${JSON.stringify (headers)}`
-    );
+    emitter.emit('info', `Request Header for Token API`);
 
     const formParams = new URLSearchParams();
     formParams.append('grant_type', 'authorization_code');
@@ -109,10 +106,7 @@ async function getTokenApi(code, template) {
             }
         })
         .then(token => {
-            emitter.emit(
-                'info',
-                `Response from Token  >>>${JSON.stringify (token)}`
-            );
+            emitter.emit('info', `Response from Token SUCCESS`);
             return token;
         });
 }
@@ -132,7 +126,7 @@ async function getPersonApi(accessToken, template) {
 
     // console.log("Decoded Access Token:");
     // console.log(JSON.stringify(decoded));
-    emitter.emit('info', `Decoded Access Token: ${JSON.stringify (decoded)}`);
+    emitter.emit('info', 'Decoded Access Token SUCCESS');
 
     const uinfin = decoded.sub;
     if (uinfin == undefined || uinfin == null) {
@@ -178,10 +172,7 @@ async function getPersonApi(accessToken, template) {
 
     // console.log("Request Header for Person API:");
     // console.log(JSON.stringify(headers));
-    emitter.emit(
-        'info',
-        `Request Header for Person API: ${JSON.stringify (headers)}`
-    );
+    emitter.emit('info', 'Request Header for Person API');
     // console.log("Sending Person Request >>>");
     emitter.emit('info', `Sending Person Request >>>${uinfin}`);
     const options = {
@@ -209,14 +200,14 @@ async function getPersonApi(accessToken, template) {
                     // console.log("Person Data :");
                     // console.log(JSON.stringify(personData));
                     // successful. return data back to frontend
-                    emitter.emit('info', `Response from Person  >>>${personData}`);
+                    emitter.emit('info', `Response from Person SUCCESS`);
                     return personData;
                 } else if (template.authLevel === 'L2') {
                     // console.log("Response from Person API:");
                     // console.log(personData);
                     //t3step3 PASTE CODE BELOW
                     // header.encryptedKey.iv.ciphertext.tag
-                    emitter.emit('info', `Response from Person  >>>${personData}`);
+                    emitter.emit('info', `Response from Person SUCCESS`);
                     const jweParts = personData.split('.');
 
                     return securityHelper
@@ -244,10 +235,7 @@ async function getPersonApi(accessToken, template) {
                             // console.log("Person Data (Decoded/Decrypted):");
                             // console.log(JSON.stringify(personData));
                             // successful. return data back to frontend
-                            emitter.emit(
-                                'info',
-                                `Person Data (Decoded/Decrypted): ${JSON.stringify (personData)}`
-                            );
+                            emitter.emit('info', 'Person Data (Decoded/Decrypted) SUCCESS');
                             return {
                                 status: 'SUCCESS',
                                 msg: personData,
