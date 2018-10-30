@@ -1,14 +1,19 @@
+const path = require('path')
 const chokidar = require('chokidar')
 const jsonfile = require('jsonfile')
 const emitter = require('./emitter')
 
-let clients = jsonfile.readFileSync('./data/clients.json')
-let template = jsonfile.readFileSync('./data/template.json')
+const clientsPath = path.resolve(__dirname, '../data/clients.json')
+const templatePath = path.resolve(__dirname, '../data/template.json')
 
-chokidar.watch('./data').on('change', (event, path) => {
+let clients = jsonfile.readFileSync(clientsPath)
+let template = jsonfile.readFileSync(templatePath)
+
+const dataPath = path.resolve(__dirname, '../data')
+chokidar.watch(dataPath).on('change', (event, path) => {
   try {
-    clients = jsonfile.readFileSync('./data/clients.json')
-    template = jsonfile.readFileSync('./data/template.json')
+    clients = jsonfile.readFileSync(clientsPath)
+    template = jsonfile.readFileSync(templatePath)
   } catch (e) {
     emitter.emit('warn', e.message)
   }

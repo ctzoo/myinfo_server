@@ -51,7 +51,7 @@
   1. Ctrl+c退出
 ### 1.2.3. 创建数据库  
   1. 执行mongo
-  2. 执行use myingo
+  2. 执行use myinfo
 ## 1.3. 部署myinfo_server
 ### 1.3.1. 创建用户
   1. 创建用户  
