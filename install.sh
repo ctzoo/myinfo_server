@@ -1,15 +1,21 @@
-sudo rpm -ivh mongodb-org-server-4.0.3-1.el7.x86_64.rpm
-sudo rpm -ivh mongodb-org-shell-4.0.3-1.el7.x86_64.rpm
-sudo rpm -ivh mongodb-org-tools-4.0.3-1.el7.x86_64.rpm
-sudo rpm -ivh nodejs-6.14.4-1nodesource.x86_64.rpm
+# https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/4.0/x86_64/RPMS/mongodb-org-server-4.0.2-1.el7.x86_64.rpm
+rpm -ivh mongodb-org-server-4.0.2-1.el7.x86_64.rpm
+# https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/4.0/x86_64/RPMS/mongodb-org-shell-4.0.2-1.el7.x86_64.rpm
+rpm -ivh mongodb-org-shell-4.0.2-1.el7.x86_64.rpm
+# https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/4.0/x86_64/RPMS/mongodb-org-tools-4.0.2-1.el7.x86_64.rpm
+rpm -ivh mongodb-org-tools-4.0.2-1.el7.x86_64.rpm
+# https://rpm.nodesource.com/pub_6.x/el/7/x86_64/nodejs-6.9.5-1nodesource.x86_64.rpm
+rpm -ivh nodejs-6.9.5-1nodesource.x86_64.rpm
 
-sudo tar -zxzf myinfo_server.tar.gz -C /opt
-sudo mv /opt/myinfo_server /opt/myinfo
+# 解压程序
+tar -zxzf myinfo_server.tar.gz -C /opt
+mv /opt/myinfo_server /opt/myinfo
 chmod 777 /opt/myinfo
 
+# 创建用户
 useradd myinfo
 
-# 创建服务脚本
+# 添加服务
 cat > /usr/lib/systemd/system/myinfo.service << EOF
 [Unit]
 Description=Myinfo Server
@@ -25,13 +31,15 @@ Type=simple
 
 [Install]
 WantedBy=multi-user.target
-
 EOF
 
-systemctl daemon-reload 
-# 设置开启启动
-systemctl enable myinfo.service
+systemctl daemon-reload
+# 启动mongod服务
+systemctl enable mongod.service
+systemctl start mongod.service
 # 启动服务
-systemctl start myinfo
+systemctl enable myinfo.service
+systemctl start myinfo.service
 # 查看服务状态
-systemctl status myinfo
+systemctl status mongod.service
+systemctl status myinfo.service
