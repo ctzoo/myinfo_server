@@ -40,7 +40,8 @@ router.get('/', router.oauth.authorise(), (req, res) => {
         oauthConfig.stateSecret
     );
     const template = getTemplate()[req.query.templateId];
-    res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, template));
+    const loginType = req.query.loginType;
+    res.redirect(myInfoApi.getAuthoriseUrl(state, user.purpose, template, loginType));
 });
 
 router.get('/callback', (req, res) => {

@@ -7,10 +7,10 @@
         "redirectUrl": "http://localhost:3001/callback",
         "realmUrl": "http://localhost:3001",
         "authLevel": "L2",
-        "authApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/authorise",
-        "tokenApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/token",
-        "personApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/person",
-        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,assessableincome,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
+        "authApiUrl": "https://test.api.myinfo.gov.sg/com/v3/authorise",
+        "tokenApiUrl": "https://test.api.myinfo.gov.sg/com/v3/token",
+        "personApiUrl": "https://test.api.myinfo.gov.sg/com/v3/person",
+        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
     },
     "smartsaver": {
         "privateKey": "./ssl/stg-myinfo-2018.pem",
@@ -20,9 +20,9 @@
         "redirectUrl": "http://localhost:3001/callback",
         "realmUrl": "http://localhost:3001",
         "authLevel": "L2",
-        "authApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/authorise",
-        "tokenApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/token",
-        "personApiUrl": "https://myinfosgstg.api.gov.sg/test/v2/person",
-        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,assessableincome,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
+        "authApiUrl": "https://test.api.myinfo.gov.sg/com/v3/authorise",
+        "tokenApiUrl": "https://test.api.myinfo.gov.sg/com/v3/token",
+        "personApiUrl": "https://test.api.myinfo.gov.sg/com/v3/person",
+        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
     }
 }

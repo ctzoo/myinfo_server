@@ -36,6 +36,7 @@
         * **Content-Type**: `application/x-www-form-urlencoded`
 
     * **Body**  
+
         * `grant_type=client_credentials`
 
     使用`curl`的事例:
@@ -46,23 +47,23 @@
     -H "Content-Type: application/x-www-form-urlencoded"
     ```
 
-	* **返回参数**  
-		* access_token  
-		
-			系统的授权token,调用`Myinfo调用接口`时需要用到
+    * **返回参数**  
+    	* access_token  
+    	
+    		系统的授权token,调用`Myinfo调用接口`时需要用到
 
-		* expires_in  
+    	* expires_in  
 
-			系统授权token的有效期，单位是秒
+    		系统授权token的有效期，单位是秒
 
     返回的结果:
 
     ```
     { 
-		token_type: 'bearer',
-  	access_token:'eyJhbGciOiJIUzI1NiJ9.YXBwbGljYXRpb24xOjE1MzEyOTYwNjYxNjE.o8MxV1RqtyTzim6_6-EErytnIicUkjv2Ih-RAwbXdT4',
-  	expires_in: 300
-	}
+    	token_type: 'bearer',
+      	access_token:'eyJhbGciOiJIUzI1NiJ9.YXBwbGljYXRpb24xOjE1MzEyOTYwNjYxNjE.o8MxV1RqtyTzim6_6-EErytnIicUkjv2Ih-RAwbXdT4',
+      	expires_in: 300
+    }
     ```
 
 ### Myinfo调用接口  
@@ -86,12 +87,16 @@
 
     - state  
 
-        通过回调URL发送给您，为每个调用使用唯一的系统生成号码。
+        通过回调URL发送给您，为每个调用使用唯一的系统生成号码
+
+    - loginType
+
+        用户登录类型，非必输项；默认值是"SINGPASS"，当值为"QR"时用户只能通过二维码登录
 
     调用事例:
 
     ```
-    http://localhost:3001?access_token=eyJhbGciOiJIUzI1NiJ9.YXBwbGljYXRpb24xOjE1MzEyOTYwNjYxNjE.o8MxV1RqtyTzim6_6-EErytnIicUkjv2Ih-RAwbXdT4&templateId=temp1&state=1234567890
+    http://localhost:3001?access_token=eyJhbGciOiJIUzI1NiJ9.YXBwbGljYXRpb24xOjE1MzEyOTYwNjYxNjE.o8MxV1RqtyTzim6_6-EErytnIicUkjv2Ih-RAwbXdT4&templateId=temp1&state=1234567890&loginType=QR
     ```
 
 ## 回调处理  
@@ -478,66 +483,3 @@ data参数解密后参数事例:
 | ERROR | INVALID DATA OR SIGNATURE FOR PERSON DATA | User's person data decrypt failure |
 
 注:当系统在向Myinfo请求数据发生网络异常时，将直接返回异常信息不再返回json格式数据
-
-## 附录  
-
-### 附录1：Myinfo能获取的信息  
-
-| attributes           | remarks                                    |
-| -------------------- | ------------------------------------------ |
-| name                 | Full Name                                  |
-| hanyupinyinname      | Han Yu Pin Yin name                        |
-| aliasname            | Alias name                                 |
-| hanyupinyinaliasname | Han Yu Pin Yin Alias name                  |
-| marriedname          | Married name                               |
-| sex                  | Sex                                        |
-| race                 | Race                                       |
-| secondaryrace        | Secondary Race                             |
-| dialect              | Dialect                                    |
-| nationality          | Nationality                                |
-| dob                  | Date of Birth                              |
-| birthcountry         | Country of Birth                           |
-| residentialstatus    | Residential Status                         |
-| passportnumber       | Passport Number                            |
-| passportexpirydate   | Passport Expiry Date                       |
-| regadd               | Registered Address                         |
-| mailadd              | Mailing Address                            |
-| billadd              | Billing Address                            |
-| housingtype          | Housing Type                               |
-| hdbtype              | HDB Type                                   |
-| ownerprivate         | Ownership of Private Property Status       |
-| email                | Email Address                              |
-| homeno               | Home Contact Number                        |
-| mobileno             | Mobile Number                              |
-| marital              | Marital Status                             |
-| marriagecertno       | Certificate number of the latest marriage  |
-| countryofmarriage    | Country of the latest marriage             |
-| marriagedate         | Latest Marriage Date                       |
-| divorcedate          | Last Divorce Date                          |
-| childrenbirthrecords | Details of Children Birth Records          |
-| relationships        | Details of Relationships                   |
-| edulevel             | Highest Education Level                    |
-| gradyear             | Year of Graduation                         |
-| schoolname           | Name of School                             |
-| occupation           | Occupation                                 |
-| employment           | Employer's Name                            |
-| workpassstatus       | Pass status of a FIN holder                |
-| workpassexpirydate   | Pass expiry of a foreigner                 |
-| householdincome      | Household Income                           |
-| assessableincome     | Latest Assessable Income                   |
-| assessyear           | Year of Assessment (for Assessable Income) |
-| cpfcontributions     | Employer CPF Contributions                 |
-| cpfbalances          | CPF Balances                               |
-| vehno                | Vehicle Number                             |
-
-### 附录2：Myinfo停机维护时间  
-
-| Production Environment                                       | Sandbox & Staging Environments |
-| ------------------------------------------------------------ | ------------------------------ |
-| CPFB data - Everyday 5:00am to 5:30am                        | Every Wednesday 3pm to 12am.   |
-| IRAS data - Every Wed, 2:00am to 6:00am, Every Sun, 2:00am to 8:30am |                                |
-| Once a month, Sunday 12:00 am to 8:00 am (date to be advised) |                                |
-
-注：具体时间以Myinfo官网为准
-
-

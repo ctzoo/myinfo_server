@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
       .then(data => {
         console.log(data);
         res.redirect(
-          `http://localhost:3001?access_token=${data.access_token}&templateId=${req.query.templateId}&state=1234567890`
+          `http://localhost:3001?access_token=${data.access_token}&templateId=${req.query.templateId}&state=1234567890&loginType=SINGPASS`
         );
       });
   } else {
