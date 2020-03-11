@@ -1,7 +1,7 @@
 {
     "creditcard": {
-        "privateKey": "./ssl/stg-myinfo-2018.pem",
-        "publicKey": "./ssl/stg-auth-signing-public.pem",
+        "privateKey": "./ssl/stg-demoapp-client-privatekey-2018.pem",
+        "publicKey": "./ssl/staging_myinfo_public_cert.cer",
         "clientId": "STG2-MYINFO-SELF-TEST",
         "clientSecret": "44d953c796cccebcec9bdc826852857ab412fbe2",
         "redirectUrl": "http://localhost:3001/callback",
@@ -13,8 +13,8 @@
         "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
     },
     "smartsaver": {
-        "privateKey": "./ssl/stg-myinfo-2018.pem",
-        "publicKey": "./ssl/stg-auth-signing-public.pem",
+        "privateKey": "./ssl/stg-demoapp-client-privatekey-2018.pem",
+        "publicKey": "./ssl/staging_myinfo_public_cert.cer",
         "clientId": "STG2-MYINFO-SELF-TEST",
         "clientSecret": "44d953c796cccebcec9bdc826852857ab412fbe2",
         "redirectUrl": "http://localhost:3001/callback",
