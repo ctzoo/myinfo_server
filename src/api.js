@@ -1,14 +1,14 @@
-const _ = require ('lodash');
-const querystring = require ('querystring');
-const fetch = require ('node-fetch');
-const HttpsProxyAgent = require ('https-proxy-agent');
-const URLSearchParams = require ('url-search-params');
-const proxyPath = require ('config').get ('proxy');
-const timeout = require ('config').get ('timeout');
-const securityHelper = require ('./security');
-const emitter = require ('./emitter');
+const _ = require('lodash');
+const querystring = require('querystring');
+const fetch = require('node-fetch');
+const HttpsProxyAgent = require('https-proxy-agent');
+const URLSearchParams = require('url-search-params');
+const proxyPath = require('config').get('proxy');
+const timeout = require('config').get('timeout');
+const securityHelper = require('./security');
+const emitter = require('./emitter');
 
-function getAuthoriseUrl (state, purpose, template, loginType) {
+function getAuthoriseUrl(state, purpose, template, loginType) {
   const url =
     template.authApiUrl +
     '?client_id=' +
@@ -24,7 +24,7 @@ function getAuthoriseUrl (state, purpose, template, loginType) {
   return loginType ? url + '&login_type=' + loginType : url;
 }
 
-async function getTokenApi (code, template) {
+async function getTokenApi(code, template) {
   const cacheCtl = 'no-cache';
   const contentType = 'application/x-www-form-urlencoded';
   const method = 'POST';
@@ -42,16 +42,16 @@ async function getTokenApi (code, template) {
     template.clientId +
     '&client_secret=' +
     template.clientSecret;
-  const params = querystring.parse (strParams);
+  const params = querystring.parse(strParams);
 
   // assemble headers for Token API
   const strHeaders =
     'Content-Type=' + contentType + '&Cache-Control=' + cacheCtl;
-  const headers = querystring.parse (strHeaders);
+  const headers = querystring.parse(strHeaders);
 
   // Sign request and add Authorization Headers
   // t3step2a PASTE CODE BELOW
-  const authHeaders = securityHelper.generateAuthorizationHeader (
+  const authHeaders = securityHelper.generateAuthorizationHeader(
     template.tokenApiUrl,
     params,
     method,
@@ -63,23 +63,20 @@ async function getTokenApi (code, template) {
     template.realmUrl
   );
 
-  if (!_.isEmpty (authHeaders)) {
-    _.set (headers, 'Authorization', authHeaders);
+  if (!_.isEmpty(authHeaders)) {
+    _.set(headers, 'Authorization', authHeaders);
   }
   // t3step2a END PASTE CODE
+  emitter.emit('info', `Myinfo Server Request Token API Header : ${JSON.stringify(headers)}`);
 
-  // console.log("Request Header for Token API:");
-  // console.log(JSON.stringify(headers));
-  emitter.emit ('info', `Request Header for Token API`);
+  const formParams = new URLSearchParams();
+  formParams.append('grant_type', 'authorization_code');
+  formParams.append('code', code);
+  formParams.append('redirect_uri', template.redirectUrl);
+  formParams.append('client_id', template.clientId);
+  formParams.append('client_secret', template.clientSecret);
 
-  const formParams = new URLSearchParams ();
-  formParams.append ('grant_type', 'authorization_code');
-  formParams.append ('code', code);
-  formParams.append ('redirect_uri', template.redirectUrl);
-  formParams.append ('client_id', template.clientId);
-  formParams.append ('client_secret', template.clientSecret);
-
-  emitter.emit ('info', `Sending Token Request >>>${code}`);
+  emitter.emit('info', `Myinfo Server Start Request Token API : ${formParams.toString()}`);
   const options = {
     headers,
     method: 'POST',
@@ -87,48 +84,47 @@ async function getTokenApi (code, template) {
     timeout: timeout * 1000,
   };
   if (proxyPath !== '') {
-    options.agent = new HttpsProxyAgent (proxyPath);
+    options.agent = new HttpsProxyAgent(proxyPath);
   }
-  return fetch (template.tokenApiUrl, options)
-    .then (res => {
+  return fetch(template.tokenApiUrl, options)
+    .then(res => {
       if (res.status === 200) {
-        return res.json ();
+        return res.json();
       } else {
-        emitter.emit ('warn', {
+        emitter.emit('warn', `Myinfo Server Request Token API Failed: ${JSON.stringify(res)}`);
+        emitter.emit('warn', {
           status: res.status,
           msg: res.statusText,
           url: res.url,
         });
-        return Promise.reject ({
+        return Promise.reject({
           status: 'ERROR',
           msg: 'Myinfo Authorization error',
         });
       }
     })
-    .then (token => {
-      emitter.emit ('info', `Response from Token SUCCESS`);
+    .then(token => {
+      emitter.emit('info', `Myinfo Server Request Token API Success Return Token: ${JSON.stringify(token)}`);
       return token;
     });
 }
 
-async function getPersonApi (accessToken, template) {
-  const decoded = securityHelper.verifyJWS (accessToken, template.publicKey);
+async function getPersonApi(accessToken, template) {
+  emitter.emit('info', `Myinfo Server Start Verify Access Token: ${accessToken}`);
+  const decoded = securityHelper.verifyJWS(accessToken, template.publicKey);
   if (decoded == undefined || decoded == null) {
-    emitter.emit ('warn', 'Invalid token, Not find Access Token');
-    return Promise.reject ({
+    emitter.emit('warn', 'Myinfo Server Verify Access Token Failed');
+    return Promise.reject({
       status: 'ERROR',
       msg: 'INVALID TOKEN',
     });
   }
-
-  // console.log("Decoded Access Token:");
-  // console.log(JSON.stringify(decoded));
-  emitter.emit ('info', 'Decoded Access Token SUCCESS');
+  emitter.emit('info', 'Myinfo Server Verify Access Token Success');
 
   const uinfin = decoded.sub;
   if (uinfin == undefined || uinfin == null) {
-    emitter.emit ('warn', 'Not find Uinfin');
-    return Promise.reject ({
+    emitter.emit('warn', 'Myinfo Server Not Find Uinfin');
+    return Promise.reject({
       status: 'ERROR',
       msg: 'UINFIN NOT FOUND',
     });
@@ -140,15 +136,15 @@ async function getPersonApi (accessToken, template) {
   // t2step6 PASTE CODE BELOW
   const strParams =
     'client_id=' + template.clientId + '&attributes=' + template.attributes;
-  const params = querystring.parse (strParams);
+  const params = querystring.parse(strParams);
 
   // assemble headers for Person API
   const strHeaders = 'Cache-Control=' + cacheCtl;
-  const headers = querystring.parse (strHeaders);
+  const headers = querystring.parse(strHeaders);
 
   // Sign request and add Authorization Headers
   // t3step2b PASTE CODE BELOW
-  const authHeaders = securityHelper.generateAuthorizationHeader (
+  const authHeaders = securityHelper.generateAuthorizationHeader(
     url,
     params,
     method,
@@ -160,57 +156,46 @@ async function getPersonApi (accessToken, template) {
     template.realmUrl
   );
   // t3step2b END PASTE CODE
-  if (!_.isEmpty (authHeaders)) {
-    _.set (headers, 'Authorization', authHeaders + ',Bearer ' + accessToken);
+  if (!_.isEmpty(authHeaders)) {
+    _.set(headers, 'Authorization', authHeaders + ',Bearer ' + accessToken);
   } else {
     // NOTE: include access token in Authorization header as "Bearer " (with space behind)
-    _.set (headers, 'Authorization', 'Bearer ' + accessToken);
+    _.set(headers, 'Authorization', 'Bearer ' + accessToken);
   }
+  emitter.emit('info', `Myinfo Server Request Person API Header: ${JSON.stringify(headers)}`);
 
-  // console.log("Request Header for Person API:");
-  // console.log(JSON.stringify(headers));
-  emitter.emit ('info', 'Request Header for Person API');
-  // console.log("Sending Person Request >>>");
-  emitter.emit ('info', `Sending Person Request >>>${uinfin}`);
   const options = {
     method: 'GET',
     headers,
     timeout: timeout * 1000,
   };
   if (proxyPath !== '') {
-    options.agent = new HttpsProxyAgent (proxyPath);
+    options.agent = new HttpsProxyAgent(proxyPath);
   }
-  return fetch (url + '?' + strParams, options)
-    .then (res => res.text ())
-    .then (personData => {
+
+  emitter.emit('info', `Myinfo Server Start Request Person API: ${uinfin}`);
+  return fetch(url + '?' + strParams, options)
+    .then(res => res.text())
+    .then(personData => {
       if (personData == undefined || personData == null) {
-        emitter.emit ('warn', 'Not found person data');
-        return Promise.reject ({
+        emitter.emit('warn', 'Myinfo Server Request Person API Failed: Not found person data');
+        return Promise.reject({
           status: 'ERROR',
           msg: 'PERSON DATA NOT FOUND',
         });
       } else {
+        emitter.emit('info', 'Myinfo Server Request Person API Success');
         if (template.authLevel === 'L0') {
-          personData = JSON.parse (personData);
+          personData = JSON.parse(personData);
           if (personData.uinfin == undefined || personData.uinfin == null) {
             personData.uinfin = uinfin; // add the uinfin into the data to display on screen
           }
-
-          // console.log("Person Data :");
-          // console.log(JSON.stringify(personData));
-          // successful. return data back to frontend
-          emitter.emit ('info', `Response from Person SUCCESS`);
           return personData;
         } else if (template.authLevel === 'L2') {
-          // console.log("Response from Person API:");
-          // console.log(personData);
-          //t3step3 PASTE CODE BELOW
-          // header.encryptedKey.iv.ciphertext.tag
-          emitter.emit ('info', `Response from Person SUCCESS`);
-          const jweParts = personData.split ('.');
-
+          const jweParts = personData.split('.');
+          emitter.emit('info', 'Myinfo Server Start Decrypt Person Data');
           return securityHelper
-            .decryptJWE (
+            .decryptJWE(
               jweParts[0],
               jweParts[1],
               jweParts[2],
@@ -218,44 +203,42 @@ async function getPersonApi (accessToken, template) {
               jweParts[4],
               template.privateKey
             )
-            .then (personDataJWS => {
+            .then(personDataJWS => {
               if (personDataJWS === undefined || personDataJWS == null) {
-                emitter.emit (
-                  'warn',
-                  'Invalid data or signature for person data jws'
-                );
-                return Promise.reject ({
+                emitter.emit('warn', 'Myinfo Server Decrypt Person Data Failed: Invalid data or signature for person data jws');
+                return Promise.reject({
                   status: 'ERROR',
                   msg: 'INVALID DATA OR SIGNATURE FOR PERSON DATA',
                 });
               }
-              const personData = securityHelper.verifyJWS (
+              emitter.emit('info', `Myinfo Server Decrypt Person Data Success: ${personDataJWS}`);
+
+              emitter.emit('info', 'Myinfo Server Start Verify Person Data');
+              const personData = securityHelper.verifyJWS(
                 personDataJWS,
                 template.publicKey
               );
               if (personData == undefined || personData == null) {
-                emitter.emit ('warn', 'Invalid signature for person data');
-                return Promise.reject ({
+                emitter.emit('warn', 'Myinfo Server Verify Person Data Failed: Invalid signature for person data');
+                return Promise.reject({
                   status: 'ERROR',
                   msg: 'INVALID DATA OR SIGNATURE FOR PERSON DATA',
                 });
               }
               if (personData.uinfin == undefined || personData.uinfin == null) {
-                personData.uinfin = uinfin; // add the uinfin into the data to display on screen
+                // add the uinfin into the data to display on screen
+                personData.uinfin = uinfin;
               }
-
-              // console.log("Person Data (Decoded/Decrypted):");
               // console.log(JSON.stringify(personData));
-              // successful. return data back to frontend
-              emitter.emit ('info', 'Person Data (Decoded/Decrypted) SUCCESS');
+              emitter.emit('info', 'Myinfo Server Verify Person Data Success');
               return {
                 status: 'SUCCESS',
                 msg: personData,
               };
             });
         } else {
-          emitter.emit ('warn', 'Unknown Auth Level');
-          return Promise.reject ({
+          emitter.emit('warn', 'Myinfo Server Decrypt Person Unknown Auth Level');
+          return Promise.reject({
             status: 'ERROR',
             msg: 'Unknown Auth Level',
           });

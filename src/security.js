@@ -124,7 +124,7 @@ security.verifyJWS = function verifyJWS(jws, publicCert) {
     return decoded;
   } catch (error) {
     console.error("Error with verifying and decoding JWE: %s".red, error);
-    throw ("Error with verifying and decoding JWS");
+    throw (`Error with verifying and decoding JWS: ${JSON.stringify(error)}`);
   }
 }
 
@@ -134,36 +134,36 @@ security.decryptJWE = function decryptJWE(header, encryptedKey, iv, cipherText, 
   // console.log(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + tag);
   return new Promise((resolve, reject) => {
 
-      var keystore = jose.JWK.createKeyStore();
+    var keystore = jose.JWK.createKeyStore();
 
-      // console.log((new Buffer(header,'base64')).toString('ascii'));
+    // console.log((new Buffer(header,'base64')).toString('ascii'));
 
-      var data = {
-        "type": "compact",
-        "ciphertext": cipherText,
-        "protected": header,
-        "encrypted_key": encryptedKey,
-        "tag": tag,
-        "iv": iv,
-        "header": JSON.parse(jose.util.base64url.decode(header).toString())
-      };
-      keystore.add(fs.readFileSync(privateKey, 'utf8'), "pem")
-        .then(function (jweKey) {
-          // {result} is a jose.JWK.KeyauthType
-          jose.JWE.createDecrypt(jweKey)
-            .decrypt(data)
-            .then(function (result) {
-              resolve(JSON.parse(result.payload.toString()));
-            })
-            .catch(function (error) {
-              reject(error);
-            });
-        });
+    var data = {
+      "type": "compact",
+      "ciphertext": cipherText,
+      "protected": header,
+      "encrypted_key": encryptedKey,
+      "tag": tag,
+      "iv": iv,
+      "header": JSON.parse(jose.util.base64url.decode(header).toString())
+    };
+    keystore.add(fs.readFileSync(privateKey, 'utf8'), "pem")
+      .then(function (jweKey) {
+        // {result} is a jose.JWK.KeyauthType
+        jose.JWE.createDecrypt(jweKey)
+          .decrypt(data)
+          .then(function (result) {
+            resolve(JSON.parse(result.payload.toString()));
+          })
+          .catch(function (error) {
+            reject(error);
+          });
+      });
 
-    })
+  })
     .catch(error => {
       // console.error("Error with decrypting JWE: %s", error);
-      throw "Error with decrypting JWE";
+      throw `Error with decrypting JWE: ${JSON.stringify(error)}`;
     })
 }
 
