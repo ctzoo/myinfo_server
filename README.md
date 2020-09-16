@@ -457,7 +457,12 @@ data参数解密后参数事例:
             "classification": "C",
             "value": "1456789.00"
         },
-        "uinfin": "S9812381D"
+        "uinfin": {
+            "lastupdated": "2015-12-23", 
+            "source": "1",
+            "classification": "C",
+            "value": "S6005048A"
+        }
     },
     "iat": 1531356750
 }
@@ -475,11 +480,11 @@ data参数解密后参数事例:
     
 ### 错误列表  
 
-|   status   |   msg   |   remarks   |
-| ---- | ---- | ---- |
-| ERROR | INVALID TOKEN | Myinfo‘s access_token validation failure |
-| ERROR | UINFIN NOT FOUND | User's  uinfin not query |
-| ERROR | PERSON DATA NOT FOUND | User's person data not query |
-| ERROR | INVALID DATA OR SIGNATURE FOR PERSON DATA | User's person data decrypt failure |
+| status | msg                                       | remarks                                  |
+|--------|-------------------------------------------|------------------------------------------|
+| ERROR  | INVALID TOKEN                             | Myinfo‘s access_token validation failure |
+| ERROR  | UINFIN NOT FOUND                          | User's  uinfin not query                 |
+| ERROR  | PERSON DATA NOT FOUND                     | User's person data not query             |
+| ERROR  | INVALID DATA OR SIGNATURE FOR PERSON DATA | User's person data decrypt failure       |
 
 注:当系统在向Myinfo请求数据发生网络异常时，将直接返回异常信息不再返回json格式数据

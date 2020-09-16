@@ -10,7 +10,7 @@
         "authApiUrl": "https://test.api.myinfo.gov.sg/com/v3/authorise",
         "tokenApiUrl": "https://test.api.myinfo.gov.sg/com/v3/token",
         "personApiUrl": "https://test.api.myinfo.gov.sg/com/v3/person",
-        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
+        "attributes": "uinfin,name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
     },
     "smartsaver": {
         "privateKey": "./ssl/stg-demoapp-client-privatekey-2018.pem",
@@ -23,6 +23,6 @@
         "authApiUrl": "https://test.api.myinfo.gov.sg/com/v3/authorise",
         "tokenApiUrl": "https://test.api.myinfo.gov.sg/com/v3/token",
         "personApiUrl": "https://test.api.myinfo.gov.sg/com/v3/person",
-        "attributes": "name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
+        "attributes": "uinfin,name,sex,race,nationality,dob,email,mobileno,regadd,housingtype,hdbtype,marital,edulevel,hanyupinyinname,aliasname,hanyupinyinaliasname,marriedname,cpfcontributions,cpfbalances"
     }
 }
